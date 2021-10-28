@@ -12,8 +12,10 @@ const { getUserById, getAllActivities, getActivityById, createActivity, updateAc
 const client = require('../db/client');
 
 describe('Database', () => {
+  console.log("hello")
   beforeAll(async() => {
     await rebuildDB();
+    console.log("world")
   })
   afterAll(async() => {
     await client.end();
@@ -23,9 +25,11 @@ describe('Database', () => {
     let userCredentials = {username: 'billybob', password: 'bobbybadboy'};
     describe('createUser({ username, password })', () => {
       beforeAll(async () => {
+        console.log("hello world")
         userToCreateAndUpdate = await createUser(userCredentials);
         const {rows} = await client.query(`SELECT * FROM users WHERE username = $1`, [userCredentials.username]);
         queriedUser = rows[0];
+        console.log("rows", rows)
       })
       it('Creates the user', async () => {
         expect(userToCreateAndUpdate.username).toBe(userCredentials.username);

@@ -5,7 +5,8 @@ async function getRoutineActivityById() {
     } catch (error) {
       throw error;
     }
-  }
+  };
+  
   async function addActivityToRoutine() {
     try {
      
@@ -13,7 +14,7 @@ async function getRoutineActivityById() {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async function updateRoutineActivity() {
     try {
@@ -22,7 +23,7 @@ async function getRoutineActivityById() {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async function destroyRoutineActivity() {
     try {
@@ -31,7 +32,7 @@ async function getRoutineActivityById() {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async function getRoutineActivitiesByRoutine() {
     try {
@@ -40,4 +41,12 @@ async function getRoutineActivityById() {
     } catch (error) {
       throw error;
     }
+  };
+
+  module.exports = {
+    getRoutineActivityById,
+    addActivityToRoutine,
+    updateRoutineActivity,
+    destroyRoutineActivity,
+    getRoutineActivitiesByRoutine,
   }

@@ -1,85 +1,67 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
-<<<<<<< HEAD
 // const { } = require('./');
-const client = require("./client");
-=======
 const { createUser, getAllActivities, createActivity, getRoutinesWithoutActivities, createRoutine, addActivityToRoutine } = require('./');
 const client = require("./client");
 
->>>>>>> 4a684e4d85c789df32251de49aa41cdc64118766
 async function dropTables() {
   // drop all tables, in the correct order
   try {
     console.log("Starting to drop tables...");
-<<<<<<< HEAD
-=======
 
->>>>>>> 4a684e4d85c789df32251de49aa41cdc64118766
     await client.query(`
         DROP TABLE IF EXISTS routine_activities;
         DROP TABLE IF EXISTS routines;
         DROP TABLE IF EXISTS activities;
         DROP TABLE IF EXISTS users;
       `);
-<<<<<<< HEAD
-=======
 
->>>>>>> 4a684e4d85c789df32251de49aa41cdc64118766
     console.log("Finished dropping tables!");
   } catch (error) {
     console.error("Error dropping tables!");
+    console.log(error, "!!!!!!!")
     throw error;
   }
-}
+};
+
 async function createTables() {
   // create all tables, in the correct order
   try {
     console.log("Starting to build tables...");
-<<<<<<< HEAD
-=======
 
->>>>>>> 4a684e4d85c789df32251de49aa41cdc64118766
     await client.query(`
       CREATE TABLE users (
         id SERIAL PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL  
       );
+
+
       CREATE TABLE activities (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) UNIQUE NOT NULL,
         description TEXT NOT NULL  
       );
+
+
       CREATE TABLE routines (
         id SERIAL PRIMARY KEY,
-<<<<<<< HEAD
-        "creatorId" INTEGER FOREIGN KEY,
-=======
         "creatorId" INTEGER REFERENCES users(id),
->>>>>>> 4a684e4d85c789df32251de49aa41cdc64118766
         "isPublic" BOOLEAN DEFAULT false,
         name VARCHAR(255) UNIQUE NOT NULL,
         goal TEXT NOT NULL  
       );
+
+
       CREATE TABLE routine_activities (
         id SERIAL PRIMARY KEY,
-<<<<<<< HEAD
-        "routineId" INTEGER FOREIGN KEY UNIQUE,
-        "activityId" INTEGER FOREIGN KEY UNIQUE,
-        duration INTEGER,
-        count INTEGER  
-      );
-    `);
-=======
         "routineId" INTEGER REFERENCES routines(id),
         "activityId" INTEGER REFERENCES activities(id),
         duration INTEGER,
         count INTEGER,
-        UNIQUE("routineId","activityId")  
+        UNIQUE ("routineId", "activityId")  
       );
     `);
 
->>>>>>> 4a684e4d85c789df32251de49aa41cdc64118766
     console.log("Finished building tables!");
   } catch (error) {
     console.error("Error building tables!");
@@ -110,7 +92,8 @@ async function createInitialUsers() {
     console.error("Error creating users!");
     throw error;
   }
-}
+};
+
 async function createInitialActivities() {
   try {
     console.log("Starting to create activities...");
@@ -268,9 +251,9 @@ async function rebuildDB() {
     await dropTables();
     await createTables();
     await createInitialUsers();
-    await createInitialActivities();
-    await createInitialRoutines();
-    await createInitialRoutineActivities();
+    // await createInitialActivities();
+    // await createInitialRoutines();
+    // await createInitialRoutineActivities();
   } catch (error) {
     console.log("Error during rebuildDB");
     throw error;

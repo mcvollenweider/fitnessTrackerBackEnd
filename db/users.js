@@ -20,7 +20,7 @@ async function createUser({ username, password }) {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
 
 
@@ -37,7 +37,7 @@ async function createUser({ username, password }) {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async function getUserById(userId) {
     try {
@@ -55,7 +55,7 @@ async function createUser({ username, password }) {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async function getUserByUsername(username) {
     try {
@@ -69,10 +69,9 @@ async function createUser({ username, password }) {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   module.exports = {
-    client,
     createUser,
     getUser,
     getUserById,
