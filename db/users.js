@@ -15,12 +15,14 @@ async function createUser({ username, password }) {
       `,
         [username, password]
       );
-        console.log(user,"!!!!!")
+      delete user.password;
       return user;
     } catch (error) {
       throw error;
     }
   }
+
+
 
   async function getUser({ username, password }) {
     try {

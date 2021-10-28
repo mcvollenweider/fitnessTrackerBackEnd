@@ -1,3 +1,43 @@
+async function getActivityById() {
+  try {
+   
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getAllActivities() {
+  try {
+   
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function createActivity() {
+  try {
+   
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function updateActivity() {
+  try {
+   
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
+
+
 async function attachActivitiesToRoutines(routines) {
     // no side effects
     const routinesToReturn = [...routines];
@@ -23,4 +63,12 @@ async function attachActivitiesToRoutines(routines) {
     } catch (error) {
       throw error;
     }
+  }
+
+  module.exports ={
+    getActivityById,
+    getAllActivities,
+    createActivity,
+    updateActivity,
+    attachActivitiesToRoutines
   }
