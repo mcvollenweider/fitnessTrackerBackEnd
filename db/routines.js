@@ -98,5 +98,5 @@ async function getRoutineById() {
     getPublicRoutinesByActivity,
     createRoutine,
     updateRoutine,
-    destroyRoutine
+    destroyRoutine,
   }
