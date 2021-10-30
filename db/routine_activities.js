@@ -41,3 +41,11 @@ async function getRoutineActivityById() {
       throw error;
     }
   }
+
+  module.exports = {
+    getRoutineActivityById,
+    addActivityToRoutine,
+    updateRoutineActivity,
+    destroyRoutineActivity,
+    getRoutineActivitiesByRoutine
+  }

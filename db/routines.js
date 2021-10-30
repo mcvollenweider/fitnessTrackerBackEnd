@@ -87,3 +87,16 @@ async function getRoutineById() {
       throw error;
     }
   }
+
+  module.exports = {
+    getRoutineById,
+    getRoutinesWithoutActivities,
+    getAllRoutines,
+    getAllPublicRoutines,
+    getAllRoutinesByUser,
+    getPublicRoutinesByUser,
+    getPublicRoutinesByActivity,
+    createRoutine,
+    updateRoutine,
+    destroyRoutine
+  }

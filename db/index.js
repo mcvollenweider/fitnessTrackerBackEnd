@@ -6,7 +6,6 @@ module.exports = {
     ...require("./seed"),
     ...require("./util"),
     ...require("./seedData"),
-    ...require("./index"),
     ...require("./routines"),
-    ...require("/routine_activities"),
+    ...require("./routine_activities"),
 }
