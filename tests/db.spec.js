@@ -35,18 +35,18 @@ describe('Database', () => {
         expect(userToCreateAndUpdate.username).toBe(userCredentials.username);
         expect(queriedUser.username).toBe(userCredentials.username);
       });
-      it('EXTRA CREDIT: Does not store plaintext password in the database', async () => {
-        expect(queriedUser.password).not.toBe(userCredentials.password);
-      });
-      it('EXTRA CREDIT: Hashes the password (salted 10 times) before storing it to the database', async () => {
-        const hashedVersion = bcrypt.compareSync(userCredentials.password, queriedUser.password);
-        expect(hashedVersion).toBe(true);
-      });
+      // it('EXTRA CREDIT: Does not store plaintext password in the database', async () => {
+      //   expect(queriedUser.password).not.toBe(userCredentials.password);
+      // });
+      // it('EXTRA CREDIT: Hashes the password (salted 10 times) before storing it to the database', async () => {
+      //   const hashedVersion = bcrypt.compareSync(userCredentials.password, queriedUser.password);
+      //   expect(hashedVersion).toBe(true);
+      // });
       it('Does NOT return the password', async () => {
         expect(userToCreateAndUpdate.password).toBeFalsy();
       })
     })
-    xdescribe('getUser({ username, password })', () => {
+    describe('getUser({ username, password })', () => {
       let verifiedUser;
       beforeAll(async () => {
         verifiedUser = await getUser(userCredentials);
@@ -61,7 +61,7 @@ describe('Database', () => {
         expect(verifiedUser.password).toBeFalsy();
       })
     })
-    xdescribe('getUserById', () => {
+    describe('getUserById', () => {
       it('Gets a user based on the user Id', async () => {
         const user = await getUserById(userToCreateAndUpdate.id);
         expect(user).toBeTruthy();
