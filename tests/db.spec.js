@@ -20,7 +20,7 @@ describe('Database', () => {
   afterAll(async() => {
     await client.end();
   })
-  describe('Users', () => {
+  xdescribe('Users', () => {
     let userToCreateAndUpdate, queriedUser;
     let userCredentials = {username: 'billybob', password: 'bobbybadboy'};
     describe('createUser({ username, password })', () => {
@@ -46,7 +46,7 @@ describe('Database', () => {
         expect(userToCreateAndUpdate.password).toBeFalsy();
       })
     })
-    describe('getUser({ username, password })', () => {
+    xdescribe('getUser({ username, password })', () => {
       let verifiedUser;
       beforeAll(async () => {
         verifiedUser = await getUser(userCredentials);
@@ -61,7 +61,7 @@ describe('Database', () => {
         expect(verifiedUser.password).toBeFalsy();
       })
     })
-    describe('getUserById', () => {
+    xdescribe('getUserById', () => {
       it('Gets a user based on the user Id', async () => {
         const user = await getUserById(userToCreateAndUpdate.id);
         expect(user).toBeTruthy();
@@ -69,7 +69,7 @@ describe('Database', () => {
       })
     })
   })
-  xdescribe('Activities', () => {
+  describe('Activities', () => {
     describe('getAllActivities', () => {
       it('selects and returns an array of all activities', async () => {
         const activities = await getAllActivities();
