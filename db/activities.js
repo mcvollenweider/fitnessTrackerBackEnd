@@ -30,7 +30,7 @@ async function getAllActivities() {
     const { rows } = await client.query(
       `
         SELECT * 
-        FROM activities; 
+        FROM activities;
       `
     );
 
@@ -38,28 +38,39 @@ async function getAllActivities() {
   } catch (error) {
     throw error;
   }
-}
+};
 
 async function createActivity({ name, description }) {
   try {
-  const newActivity =
+  const { rows: [activities]} =
    await client.query(
       `
       INSERT INTO activities(name, description)
-      VALUES ($1, $2);
+      VALUES ($1, $2)
+      ON CONFLICT (name) DO NOTHING
+      RETURNING *;
       `,
       [name, description]
     );
 
-  return newActivity;
+  return activities;
   } catch (error) {
     throw error;
   }
-}
 
-async function updateActivity() {
+};
+
+async function updateActivity({id, name, description}) {
   try {
-    return;
+    const {rows: [activities]} = await client.query(
+      `UPDATE activities
+      SET "name" = $2, "description" = $3
+      WHERE "id" = $1
+      RETURNING *;
+      `, [id, name, description]
+    )
+
+    return activities;
   } catch (error) {
     throw error;
   }

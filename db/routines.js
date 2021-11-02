@@ -1,3 +1,5 @@
+const client = require("./client");
+
 async function getRoutineById() {
     try {
      
@@ -18,12 +20,18 @@ async function getRoutineById() {
 
   async function getAllRoutines() {
     try {
-     
-      return;
+     const {rows: [routines]} = await client.query(
+       `
+       SELECT username, duration, count
+       FROM routines;
+       `
+     )
+      return rows;
     } catch (error) {
       throw error;
     }
   }
+
 
   async function getAllPublicRoutines() {
     try {
@@ -36,8 +44,15 @@ async function getRoutineById() {
 
   async function getAllRoutinesByUser() {
     try {
-     
-      return;
+      const { rows: routines } = await client.query(`
+      SELECT id
+      FROM routines
+      WHERE "authorId"=${ userId };
+    `);
+    const routine = await Promise.all(userId.map(
+      routine => getRoutineById( routines.id )
+    ));
+      return routines;
     } catch (error) {
       throw error;
     }
@@ -61,17 +76,34 @@ async function getRoutineById() {
     }
   }
 
-  async function createRoutine() {
+  async function createRoutine({name, description}) {
     try {
+      const { rows: [routines]} =
+      await client.query(
+         `
+         INSERT INTO routines(name, description)
+         VALUES ($1, $2)
+         ON CONFLICT (name) DO NOTHING
+         RETURNING *;
+         `,
+         [name, description]
+       );
      
-      return;
+      return routines;
     } catch (error) {
       throw error;
     }
   }
 
-  async function updateRoutine() {
+  async function updateRoutine({id, name, description}) {
     try {
+      const {rows: [routines]} = await client.query(
+        `UPDATE routines
+        SET "name" = $2, "description" = $3
+        WHERE "id" = $1
+        RETURNING *;
+        `, [id, name, description]
+      )
      
       return;
     } catch (error) {
