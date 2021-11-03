@@ -1,7 +1,5 @@
 const client = require("./client");
 
-
-
 async function getActivityById(id) {
   try {
     const {
