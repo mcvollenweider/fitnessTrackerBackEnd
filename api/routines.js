@@ -1,6 +1,7 @@
 const express = require("express");
 const { getAllPublicRoutines, createRoutine } = require("../db");
 const routinesRouter = express.Router();
+const {} = require("../db");
 
 // GET /routines
 routinesRouter.get('/routines', async (req, res, next)=>{

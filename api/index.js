@@ -16,9 +16,11 @@ app.listen(80, function () {
 });
 
 // GET /health
-apiRouter.get('/health', async (req, res,)={
+apiRouter.get('/health', async (req, res,next)={
     // A common need is to see if our server is up (not completely crashed). We can create a route to send back a message, just a string saying all is well.
-
+    
+  
+    next();
 
 });
 

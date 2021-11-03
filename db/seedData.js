@@ -1,6 +1,31 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
 // const { } = require('./');
-const { createUser, getAllActivities, createActivity, getRoutinesWithoutActivities, createRoutine, addActivityToRoutine } = require('./');
+const { 
+  createUser,
+  getUser,
+  getUserById,
+  getUserByUsername,
+  getActivityById, 
+  getAllActivities, 
+  createActivity,
+  updateActivity,
+  getRoutineById,
+  getRoutinesWithoutActivities,
+  getAllRoutines,
+  getAllPublicRoutines,
+  getAllRoutinesByUser,
+  getPublicRoutinesByUser,
+  getPublicRoutinesByActivity,
+  createRoutine,
+  updateRoutine,
+  destroyRoutine,
+  getRoutineActivityById,
+  addActivityToRoutine,
+  updateRoutineActivity,
+  destroyRoutineActivity,
+  getRoutineActivitiesByRoutine,
+  attachActivitiesToRoutines
+ } = require('./');
 const client = require("./client");
 
 async function dropTables() {
@@ -251,9 +276,9 @@ async function rebuildDB() {
     await dropTables();
     await createTables();
     await createInitialUsers();
-    // await createInitialActivities();
-    // await createInitialRoutines();
-    // await createInitialRoutineActivities();
+    await createInitialActivities();
+    await createInitialRoutines();
+    await createInitialRoutineActivities();
   } catch (error) {
     console.log("Error during rebuildDB");
     throw error;
