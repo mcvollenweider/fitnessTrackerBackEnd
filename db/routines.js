@@ -52,8 +52,10 @@ async function getAllRoutines() {
        SELECT routines.* AS count, users.username AS "creatorName"
        FROM routines
        JOIN users ON
-       routines."creatorId" = users.id;
+       routines."creatorId" = users.id
+       WHERE routines."creatorId" = users.id;
        `
+
     );
       return attachActivitiesToRoutines(routines);
 
@@ -64,8 +66,13 @@ async function getAllRoutines() {
 
 async function getAllPublicRoutines() {
   try {
+    const {rows: [routines]} = await client.query(
+      `SELECT * FROM routines
+      WHERE "isPublic" = 'true';
+      `
+    )
 
-    return;
+    return routines;
   } catch (error) {
     throw error;
   }
@@ -105,17 +112,15 @@ async function getPublicRoutinesByActivity() {
 
 async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
-     await client.query(
+     const {rows: [routine]} = await client.query(
       `
-         INSERT INTO routines(creatorId, isPublic, name, goal)
+         INSERT INTO routines("creatorId", "isPublic", "name", "goal")
          VALUES ($1, $2, $3, $4)
-         ON CONFLICT (name) DO NOTHING
          RETURNING *;
          `,
-      [name, goal]
+      [creatorId, isPublic, name, goal]
     );
-      const newRoutine = {name, goal};
-    return newRoutine;
+    return routine;
   } catch (error) {
     throw error;
   }
