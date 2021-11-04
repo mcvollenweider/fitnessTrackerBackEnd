@@ -1,5 +1,7 @@
 const client = require("./client");
 const { attachActivitiesToRoutines } = require("./activities")
+const { getUserByUsername } = require("./users");
+const usersRouter = require("../api/users");
 
 async function getRoutineById(id) {
   try {
@@ -49,7 +51,7 @@ async function getAllRoutines() {
       rows: routines
     } = await client.query(
       `
-       SELECT routines.* AS count, users.username AS "creatorName"
+       SELECT routines.*, users.username AS "creatorName"
        FROM routines
        JOIN users ON
        routines."creatorId" = users.id
@@ -66,37 +68,54 @@ async function getAllRoutines() {
 
 async function getAllPublicRoutines() {
   try {
-    const {rows: [routines]} = await client.query(
-      `SELECT * FROM routines
+    const {rows: routines} = await client.query(
+      `SELECT routines.*, users.username AS "creatorName" 
+      FROM routines
+      JOIN users on routines."creatorId" = users.id
       WHERE "isPublic" = 'true';
       `
     )
 
-    return routines;
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
 }
 
-async function getAllRoutinesByUser() {
+async function getAllRoutinesByUser({ username }) {
+ 
   try {
-    const { rows: routines } = await client.query(`
-      SELECT id
+    const {rows: routines} = await client.query(
+      `SELECT routines.*, users.username AS "creatorName" 
       FROM routines
-      WHERE "authorId"=${userId};
-    `);
-    const routine = await Promise.all(
-      userId.map((routine) => getRoutineById(routines.id))
-    );
-    return routines;
+      JOIN users on routines."creatorId" = users.id
+      WHERE "creatorName" = ${username};
+
+    `
+    )
+    console.log(routines,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    return attachActivitiesToRoutines(routines);
+    
   } catch (error) {
     throw error;
-  }
+  
+}
 }
 
-async function getPublicRoutinesByUser() {
+async function getPublicRoutinesByUser({ username }) {
   try {
-    return;
+    const {
+      rows:[username]
+    } = await client.query(
+      `
+        SELECT * 
+        FROM routines
+        WHERE id=${username}; 
+      `,
+      
+    );
+
+    return username;
   } catch (error) {
     throw error;
   }
