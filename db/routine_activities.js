@@ -1,4 +1,5 @@
 const client = require("./client");
+const {dbFields} = require("./util");
 
 async function getRoutineActivityById(id) {
   try {
@@ -38,22 +39,20 @@ async function getRoutineActivityById(id) {
     }
   };
 
-  async function updateRoutineActivity({ id, count, duration }) {
-    if(id !== routine_activity.id){
-      return null;
-    }
+  async function updateRoutineActivity({ id, ...fields }) {
+  const result = dbFields(fields);
 
     try {
-      const { rows: activities} = await client.query(
+      const { rows: [routine_activity]} = await client.query(
         `
         UPDATE routine_activities
-        SET "count" = $2, "duration" = $3
-        WHERE "id"=$1  
+        SET ${result.insert}
+        WHERE "id"=${id}  
         RETURNING *;
         `
-      , [id, count, duration])
+      , result.vals)
      
-      return activities;
+      return routine_activity;
     } catch (error) {
       throw error;
     }
@@ -61,19 +60,16 @@ async function getRoutineActivityById(id) {
 
   async function destroyRoutineActivity(id) {
     try {
-      const {
-        rows: [routine_activity]
-      } = await client.query(
+      await client.query(
         `DELETE FROM routine_activities
-        WHERE "id"=$1
-        `
-      , [id])
-      delete routineActivity.id
-      return routine_activity;
+        WHERE "routineActivityId"=${id}
+        RETURNING *;
+        `)
     } catch (error) {
       throw error;
     }
   };
+
 
 
   async function getRoutineActivitiesByRoutine() {
@@ -84,6 +80,8 @@ async function getRoutineActivityById(id) {
       throw error;
     }
   };
+
+  
 
   module.exports = {
     getRoutineActivityById,

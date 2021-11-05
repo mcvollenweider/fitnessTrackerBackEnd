@@ -74,6 +74,28 @@ async function updateActivity({id, name, description}) {
   }
 }
 
+// async function updateActivity({ id, ...fields }) {
+//   try {
+//     const result = dbFields(fields);
+//     console.log(result, "Results form update activity");
+//     const {
+//       rows: [activity],
+//     } = await client.query(
+//       `
+//     UPDATE activities
+//     SET ${result.insert}
+//     WHERE id=${id}
+//     RETURNING *;
+//     `,
+//       result.vals
+//     );
+//     return activity;
+//   } catch (error) {
+//     throw error;
+//   }
+// }
+// ^NOT PASSING ALTHOUGH ...FIELDS MAKES MORE SENSE TO ME
+
 async function attachActivitiesToRoutines(routines) {
   // no side effects
   const routinesToReturn = [...routines];

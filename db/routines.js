@@ -1,5 +1,6 @@
 const client = require("./client");
 const { attachActivitiesToRoutines } = require("./activities")
+const {dbFields} = require("./util")
 const { getUserByUsername } = require("./users");
 const usersRouter = require("../api/users");
 
@@ -51,11 +52,9 @@ async function getAllRoutines() {
       rows: routines
     } = await client.query(
       `
-       SELECT routines.*, users.username AS "creatorName"
-       FROM routines
-       JOIN users ON
-       routines."creatorId" = users.id
-       WHERE routines."creatorId" = users.id;
+       SELECT routines.*, users.username AS "creatorName" FROM routines
+       JOIN users ON routines."creatorId"=users.id
+       WHERE routines."creatorId"=users.id;
        `
 
     );
@@ -69,10 +68,9 @@ async function getAllRoutines() {
 async function getAllPublicRoutines() {
   try {
     const {rows: routines} = await client.query(
-      `SELECT routines.*, users.username AS "creatorName" 
-      FROM routines
-      JOIN users on routines."creatorId" = users.id
-      WHERE "isPublic" = 'true';
+      `SELECT routines.*, users.username AS "creatorName" FROM routines
+      JOIN users ON routines."creatorId"=users.id
+      WHERE "isPublic"='true';
       `
     )
 
@@ -83,17 +81,16 @@ async function getAllPublicRoutines() {
 }
 
 async function getAllRoutinesByUser({ username }) {
+  const user = await getUserByUsername(username);
  
   try {
     const {rows: routines} = await client.query(
       `SELECT routines.*, users.username AS "creatorName" 
       FROM routines
-      JOIN users on routines."creatorId" = users.id
-      WHERE "creatorName" = ${username};
-
+      JOIN users on routines."creatorId"=users.id
+      WHERE "creatorId"=$1;
     `
-    )
-    console.log(routines,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    , [user.id])
     return attachActivitiesToRoutines(routines);
     
   } catch (error) {
@@ -103,27 +100,38 @@ async function getAllRoutinesByUser({ username }) {
 }
 
 async function getPublicRoutinesByUser({ username }) {
+  
   try {
+    const user = await getUserByUsername(username);
     const {
-      rows:[username]
+      rows: routines
     } = await client.query(
       `
-        SELECT * 
-        FROM routines
-        WHERE id=${username}; 
-      `,
+        SELECT routines.*, users.username AS "creatorName" FROM routines
+        JOIN users ON routines."creatorId"=users.id
+        WHERE "creatorId"=$1
+        AND "isPublic"='true' 
+      `, [user.id]
       
     );
 
-    return username;
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
 }
+// ^STILL NOT PASSING
 
-async function getPublicRoutinesByActivity() {
+async function getPublicRoutinesByActivity({ id }) {
   try {
-    return;
+    const {rows: routines} = await client.query(
+      `
+      SELECT routines.*, users.username AS "creatorName" FROM routines
+      JOIN users ON routines."creatorId"=users.id
+      WHERE "isPublic"='true'
+      `
+    )
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
@@ -145,20 +153,21 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
   }
 }
 
-async function updateRoutine({ id, name, description }) {
+async function updateRoutine({ id, ...fields }) {
   try {
+    const result = dbFields(fields);
     const {
-      rows: [routines],
+      rows: [routine],
     } = await client.query(
-      `UPDATE routines
-        SET "name" = $2, "description" = $3
-        WHERE "id" = $1
-        RETURNING *;
-        `,
-      [id, name, description]
+      `
+    UPDATE routines
+    SET ${result.insert}
+    WHERE id=${id}
+    RETURNING *;
+    `,
+      result.vals
     );
-
-    return;
+    return routine;
   } catch (error) {
     throw error;
   }
@@ -166,17 +175,14 @@ async function updateRoutine({ id, name, description }) {
 
 async function destroyRoutine(id) {
   try{
-  const {
-    rows: [routines],
-  } = await client.query(
-  ` DELETE FROM routines
-    WHERE "id" = $1  
 
-  `
-  ,[id]
-  );
+  await client.query(
+    ` DELETE FROM routines
+      WHERE id=$1
+      RETURNING *;
+    `
+    );
 
-  return routines;
   } catch (error) {
     throw error;
   }
