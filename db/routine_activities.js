@@ -60,11 +60,13 @@ async function getRoutineActivityById(id) {
 
   async function destroyRoutineActivity(id) {
     try {
-      await client.query(
+      const {rows: [routineActivity]} = await client.query(
         `DELETE FROM routine_activities
-        WHERE "routineActivityId"=${id}
+        WHERE id=$1
         RETURNING *;
-        `)
+        `, [id])
+
+        return routineActivity;
     } catch (error) {
       throw error;
     }
@@ -81,12 +83,34 @@ async function getRoutineActivityById(id) {
     }
   };
 
+  async function getAllRoutineActivities() {
+    try {
+      const {
+        rows: routine_activities
+      } = await client.query(
+        `
+         SELECT routine_activities.*, users.username AS "creatorName" FROM routines
+         JOIN users ON routines."creatorId"=users.id
+         WHERE routines."creatorId"=users.id;
+         `
+  
+      );
+        return attachActivitiesToRoutines(routine_activities);
+  
+    } catch (error) {
+      throw error;
+    }
+  }
+
   
 
   module.exports = {
     getRoutineActivityById,
-    addActivityToRoutine,
-    updateRoutineActivity,
-    destroyRoutineActivity,
-    getRoutineActivitiesByRoutine,
+  addActivityToRoutine,
+  getAllRoutineActivities,
+  getRoutineActivitiesByRoutine,
+  updateRoutineActivity,
+  destroyRoutineActivity,
+  // canEditRoutineActivity,
+
   }

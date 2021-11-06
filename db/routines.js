@@ -177,16 +177,29 @@ async function destroyRoutine(id) {
   try{
 
   await client.query(
-    ` DELETE FROM routines
-      WHERE id=$1
-      RETURNING *;
+    ` DELETE FROM routine_activities
+      WHERE "routineId"=$1;
     `
-    );
+    , [id]);
 
+    const {rows: [routine]} = await client.query(
+      ` DELETE FROM routines
+        WHERE id=$1
+        RETURNING *;
+      `
+      , [id]);
+
+      return routine;
   } catch (error) {
     throw error;
   }
 }
+
+// NOTE:
+// For the following database adapter functions, we will have to first create the functions in this order for our seed file (and tests) to work! createUser, createActivity, createRoutine, getRoutinesWithoutActivities, getAllActivities, addActivityToRoutine While writing these functions, we should be running the npm run seed:dev script, to test the functions as we go. As we build these functions, also require them into db/seedData.js so the seed script will be able to use them. It's always best to test our functions as we go!
+
+// Once we have some of our adapters (functions) working, we should stop using the seed script, and start running the npm run test:watch db script to run automated tests to verify we have created them correctly. In order to get full credit, we must pass the automated tests.
+
 
 module.exports = {
   getRoutineById,
