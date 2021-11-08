@@ -4,4 +4,5 @@ module.exports = {
     ...require("./activities"),
     ...require("./routines"),
     ...require("./routine_activities"),
+    ...require("./client")
 }

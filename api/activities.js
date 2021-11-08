@@ -1,41 +1,74 @@
-const express = require("express");
-const { createActivity } = require("../db");
+const express = require('express');
 const activitiesRouter = express.Router();
+const { getUserById,getAllActivities,getActivityById,createActivity,updateActivity,getRoutineById,
+  getAllRoutines,getAllPublicRoutines,getAllRoutinesByUser,getPublicRoutinesByUser,
+  getPublicRoutinesByActivity,createRoutine,updateRoutine,destroyRoutine,createUser,getUser,
+  getRoutineActivitiesByRoutine,addActivityToRoutine,updateRoutineActivity,destroyRoutineActivity,
+  attachActivitiesToRoutines } = require('../db');
 
 
-// GET /activities
-activitiesRouter.get("/", async (req, res) => {
-// Just return a list of all activities in the database
+activitiesRouter.use((req, res, next) => {
+  console.log("A request is being made to activities");
+
+  next(); // THIS IS DIFFERENT
+});
+
+activitiesRouter.get("/", async (req, res, next) => {
+  try{
     const activities = await getAllActivities();
+    if(activities){
+        res.send(activities);
+      } else{
+        next({
+          name: 'error',
+          message: 'getAllActivities'
+        })
+      }
   
-    res.send({
-      activities,
-    });
-});   
+    } catch ({ name, message }) {
+      next({ name, message });
+    }
+});
 
-
-// POST /activities (*)
-activitiesRouter.post('activities', async (req, res, next)=>{
-    // Create a new activity
-    const newActivity = await createActivity();
-
-    res.send({
-        newActivity,
-    })
-})
-
-// PATCH /activities/:activityId (*)
-activitiesRouter.patch('/:activityId', async (req, res, next)=>{
-// Anyone can update an activity
-
-})
+activitiesRouter.post("/", async (req, res, next) => {
+  const { name, description } = req.body;
+  try{
+      const activity = await createActivity(req.body);
+      if(activity){
+          res.send(activity);
+        } else{
+          next({
+            name: 'error',
+            message: 'createActivity'
+          })
+        }
     
+      } catch ({ name, message }) {
+        next({ name, message });
+      }
+});
 
-// GET /activities/:activityId/routines
-activitiesRouter.get('/activities/activityId', async (req, res, next)=>{
-    // Get a list of all public routines which feature that activity
+activitiesRouter.patch("/:activityId", async (req, res, next) => {
+  res.send("patch activityId")
+});
 
+activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
+  const { activityId } = req.params;
+  try{
+  const routines = await getPublicRoutinesByActivity( activityId );
+  if(routines){
+      res.send(routines);
+    } else{
+      res.send("routine error")
+      next({
+        name: 'error',
+        message: 'cannot get routines for this activity'
+      })
+    }
 
-})
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
 
 module.exports = activitiesRouter;
