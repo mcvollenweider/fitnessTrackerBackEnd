@@ -1,92 +1,60 @@
-const express = require('express');
-const routinesRouter = express.Router();
-const { main } = require('./users');
+const express = require("express");
+const routineRouter = express.Router();
+const {
+  getAllPublicRoutines,
+  createRoutine,
+  updateRoutine,
+} = require("../db/routines");
+const { requireUser } = require("./utils");
 
-routinesRouter.use((req, res, next) => {
-  console.log("A request is being made to routines");
-  next(); // THIS IS DIFFERENT
+routineRouter.get("/", async (req, res, next) => {
+  try {
+    const routines = await getAllPublicRoutines();
+    if (routines) {
+      res.send(routines);
+    } else {
+      res.send({ message: "No activities found" });
+    }
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
 });
-// NEW
-const { getUserById,getAllActivities,getActivityById,createActivity,updateActivity,getRoutineById,
-  getAllRoutines,getAllPublicRoutines,getAllRoutinesByUser,getPublicRoutinesByUser,
-  getPublicRoutinesByActivity,createRoutine,updateRoutine,destroyRoutine,createUser,getUser,
-  getRoutineActivitiesByRoutine,addActivityToRoutine,updateRoutineActivity,destroyRoutineActivity,
-  attachActivitiesToRoutines } = require('../db');
 
-  routinesRouter.get("/", async (req, res, next) => {
-    try{
-      const routines = await getAllRoutines();
-      if(routines){
-        console.log(main)
-          res.send(routines);
-        } else{
-          next({
-            name: 'error',
-            message: 'getAllRoutines'
-          })
-        }
-    
-      } catch ({ name, message }) {
-        next({ name, message });
-      }
-  });
+routineRouter.post("/", requireUser, async (req, res, next) => {
+  const { name, goal, isPublic } = req.body;
+  const id = req.user;
 
-  routinesRouter.post("/", async (req, res, next) => {
-    const { creatorId, isPublic, name, goal } = req.body;
-    try{
-        const routine = await createRoutine(req.body);
-        if(routine){
-            res.send(routine);
-          } else{
-            next({
-              name: 'error',
-              message: 'createRoutine'
-            })
-          }
-      
-        } catch ({ name, message }) {
-          next({ name, message });
-        }
-  });
+  try {
+    if ((name, goal, isPublic)) {
+      const createdRoutine = await createRoutine({ id, isPublic, name, goal });
+      res.send(createdRoutine);
+    } else {
+      res.send({ message: "Missing fields" });
+    }
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
 
-  routinesRouter.patch("/:routineId", async (req, res, next) => {
-    res.send("patch routineId")
-  });
+routineRouter.patch("/:routineId", async (req, res, next) => {
+  const { routineId } = req.params;
+  const { name, goal, isPublic } = req.body;
 
-  routinesRouter.delete("/:routineId", async (req, res, next) => {
-    const { activityId } = req.params;
-    try{
-      const close = await destroyRoutine(activityId);
-      if(close){
-          res.send(close);
-        } else{
-          next({
-            name: 'error',
-            message: 'destroyRoutine'
-          })
-        }
-    
-      } catch ({ name, message }) {
-        next({ name, message });
-      }
-  });
+  try {
+    if ((routineId, name, goal, isPublic)) {
+      const updatedRoutine = await updateRoutine({
+        id: routineId,
+        name,
+        goal,
+        isPublic,
+      });
+      res.send(updatedRoutine);
+    } else {
+      res.send({ message: "Missing fields" });
+    }
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
 
-  routinesRouter.post("/:routineId/activities", async (req, res, next) => {
-    const { activityId } = req.params;
-    try{
-      const close = await destroyRoutine(activityId);
-      if(close){
-          res.send(close);
-        } else{
-          next({
-            name: 'error',
-            message: 'destroyRoutine'
-          })
-        }
-    
-      } catch ({ name, message }) {
-        next({ name, message });
-      }
-  });
-
-module.exports = routinesRouter;
+module.exports = routineRouter;

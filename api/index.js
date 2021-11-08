@@ -4,9 +4,9 @@
 const express = require("express");
 const apiRouter = express.Router();
 const client = require("../db/client");
-const {getUserByUsername} = require("../db/users");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET = "neverTell" } = process.env;
+const { getUserById } = require("../db/users");
 
 apiRouter.get("/health", async (req, res, next) => {
   try {
@@ -18,45 +18,62 @@ apiRouter.get("/health", async (req, res, next) => {
   }
 });
 
-apiRouter.use('/', async (req, res, next) => {
-	const auth = req.header('Authorization');
+apiRouter.use(async (req, res, next) => {
+  const auth = req.header("Authorization");
 
-	if (!auth) {
-		return next();
-	}
+  if (!auth) {
+    return next();
+  }
 
-	if (auth.startsWith('Bearer ')) {
-		const token = auth.slice('Bearer '.length);
+  if (auth.startsWith("Bearer ")) {
+    const token = auth.slice("Bearer ".length);
 
-		try {
-			const { username } = verify(token, JWT_SECRET);
+    try {
+      const parsedToken = jwt.verify(token, JWT_SECRET);
+      console.log(parsedToken, "parsed token");
 
-			if (username) {
-				req.user = await getUserByUsername(username);
-				return next();
-			}
-		} catch ({ name, message }) {
-			next({ name, message });
-		}
-	} else {
-		next({ name: 'AuthError', message: 'Error in authorization format' });
-	}
+      const id = parsedToken && parsedToken.id;
+      if (id) {
+        req.user = await getUserById(id);
+        next();
+      }
+      // const parsedToken = jwt.verify(token, JWT_SECRET);
+      // console.log(parsedToken,'parsed token')
+
+      //   const username = parsedToken && parsedToken.username
+      //   console.log(username, 'userName')
+
+      //   console.log(await getUserByUsername(username), 'user maybe')
+      // if (username) {
+      //   req.user = await getUserByUsername(username);
+      //   return next();
+      // }
+    } catch ({ name, message }) {
+      next({ name, message });
+    }
+  } else {
+    next({ name: "AuthError", message: "Error in authorization format" });
+  }
 });
 
+apiRouter.use((req, res, next) => {
+  console.log(req.user, "!!!!");
+  if (req.user) {
+    console.log("User is set:", req.user);
+  }
+  next();
+});
 
 const usersRouter = require("./users");
 apiRouter.use("/users", usersRouter);
-apiRouter.use((error, req, res, next) => {
-  res.send(error);
-});
 
-const activitiesRouter = require('./activities');
-apiRouter.use('/activities', activitiesRouter);
+const activityRouter = require("./activities");
+apiRouter.use("/activities", activityRouter);
 
-const routinesRouter = require('./routines');
-apiRouter.use('/routines', routinesRouter);
+const routineRouter = require("./routines");
+apiRouter.use("/routines", routineRouter);
 
-const routineActivitiesRouter = require('./routine_activities');
-apiRouter.use('/routine_activities', routineActivitiesRouter);
-
+// apiRouter.use((error, req, res, next) => {
+//   res.send(error);
+// });
 module.exports = apiRouter;

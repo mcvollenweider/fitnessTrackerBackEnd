@@ -1,4 +1,5 @@
 // create the express server here
+
 require("dotenv").config();
 
 const { PORT = 3000 } = process.env;
@@ -14,15 +15,18 @@ server.use(morgan("dev"));
 
 server.use(express.json());
 
-server.use("/api", require("./api"));
+const axios = require("axios");
+axios.defaults.adapter = require("axios/lib/adapters/http");
 
+server.use("/api", require("./api"));
 
 server.use("*", (req, res, next) => {
   res.status(404).send({ error: "route not found" });
 });
 
 server.use((error, req, res, next) => {
-  res.status(500).send({ error: error.message });
+  res.status(500)
+  res.send({ error: error.message });
 });
 
 const client = require("./db/client");
