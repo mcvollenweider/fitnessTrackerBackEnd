@@ -100,27 +100,22 @@ async function getAllRoutinesByUser({ username }) {
 }
 
 async function getPublicRoutinesByUser({ username }) {
-  
   try {
     const user = await getUserByUsername(username);
-    const {
-      rows: routines
-    } = await client.query(
+    const { rows: routines } = await client.query(
       `
-        SELECT routines.*, users.username AS "creatorName" FROM routines
-        JOIN users ON routines."creatorId"=users.id
-        WHERE "creatorId"=$1
-        AND "isPublic"='true' 
-      `, [user.id]
-      
+      SELECT routines.*, users.username AS "creatorName" FROM routines 
+      JOIN users ON routines."creatorId"=users.id
+      WHERE "creatorId"=$1
+      AND "isPublic"='true'
+    `,
+      [user.id]
     );
-
     return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
 }
-// ^STILL NOT PASSING
 
 async function getPublicRoutinesByActivity({ id }) {
   try {
