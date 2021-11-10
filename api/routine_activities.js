@@ -1,51 +1,66 @@
-const express = require('express');
+const express = require("express");
 const routineActivitiesRouter = express.Router();
-// const { getUserById,getAllActivities,getActivityById,createActivity,updateActivity,getRoutineById,
-//   getAllRoutines,getAllPublicRoutines,getAllRoutinesByUser,getPublicRoutinesByUser,
-//   getPublicRoutinesByActivity,createRoutine,updateRoutine,destroyRoutine,createUser,getUser,
-//   getRoutineActivitiesByRoutine,addActivityToRoutine,updateRoutineActivity,destroyRoutineActivity,
-//   attachActivitiesToRoutines } = require('../db');
 
-//   routineActivitiesRouter.use((req, res, next) => {
-//   console.log("A request is being made to routine activities");
+const { requireUser } = require("./utils");
+const {
+  updateRoutineActivity,
+  getRoutineById,
+  destroyRoutineActivity,
+  getRoutineActivityById,
+} = require("../db");
 
-//   next(); 
-// });
+routineActivitiesRouter.patch(
+  "/:routineActivityId",
+  requireUser,
+  async (req, res, next) => {
+    const { routineActivityId: id } = req.params;
+    const { count, duration } = req.body;
+    try {
+      const routineActivity = await getRoutineActivityById(id);
 
-// routineActivitiesRouter.patch("/:routineActivityId", async (req, res, next) => {
-//     const { id, name, description } = req.body;
-//     try{
-//       const patch = await updateActivity( id, name, description );
-//       if(patch){
-//           res.send(patch);
-//         } else{
-//           next({
-//             name: 'error',
-//             message: 'destroyRoutineActivity'
-//           })
-//         }
-    
-//       } catch ({ name, message }) {
-//         next({ name, message });
-//       }
-//   });
+      const routine = await getRoutineById(routineActivity.routineId);
 
-//   routineActivitiesRouter.delete("/:routineActivityId", async (req, res, next) => {
-//     const { routineActivityId } = req.params;
-//     try{
-//       const close = await destroyRoutineActivity(routineActivityId);
-//       if(close){
-//           res.send(close);
-//         } else{
-//           next({
-//             name: 'error',
-//             message: 'destroyRoutineActivity'
-//           })
-//         }
-    
-//       } catch ({ name, message }) {
-//         next({ name, message });
-//       }
-//   });
+      if (req.user.id === routine.creatorId) {
+        const updatedActivity = await updateRoutineActivity({
+          id,
+          count,
+          duration,
+        });
+        res.send(updatedActivity);
+      } else {
+        next({
+          name: "Cannot Update Routine Activity",
+          message: "Permission not granted",
+        });
+      }
+    } catch ({ name, message }) {
+      next({ name, message });
+    }
+  }
+);
 
-  module.exports = routineActivitiesRouter;
+routineActivitiesRouter.delete(
+  "/:routineActivityId",
+  requireUser,
+  async (req, res, next) => {
+    const { routineActivityId: id } = req.params;
+
+    try {
+      const routineActivity = await getRoutineActivityById(id);
+      const routine = await getRoutineById(routineActivity.routineId);
+      if (req.user.id === routine.creatorId) {
+        const deletedActivity = await destroyRoutineActivity(id);
+        res.send(deletedActivity);
+      } else {
+        next({
+          name: "Cannot Update",
+          message: "Permission not granted",
+        });
+      }
+    } catch ({ name, message }) {
+      next({ name, message });
+    }
+  }
+);
+
+module.exports = routineActivitiesRouter;
